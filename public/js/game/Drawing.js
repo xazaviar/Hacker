@@ -9,9 +9,9 @@ function Drawing(context) {
 
     //Blinking cursor
     //this.cursorSymbol = "█"; //https://coolsymbol.com/square-rectangle-symbols.html
-    this.cursorVis = false;
+    this.tick = 0;
     var cont = this;
-    setInterval(function(){cont.cursorVis=!cont.cursorVis;},500);
+    setInterval(function(){cont.tick++},500);
 }
 
 Drawing.create = function(context){
@@ -39,7 +39,7 @@ Drawing.prototype.status = function(status){
     
 }
 
-Drawing.prototype.terminal = function(status, log, command, cursorIndex){
+Drawing.prototype.terminal = function(status, log, command, cursorIndex, waiting){
     var scale = 1920/this.context.canvas.width;
     var offset = 15/scale, viewWid = this.context.canvas.width * .70;
     var color = 'rgb(0,255,255,.95)';
@@ -52,12 +52,25 @@ Drawing.prototype.terminal = function(status, log, command, cursorIndex){
     this.context.strokeRect(offset, offset, viewWid, canvas.height - offset*2);
     this.context.fill();
 
-    //Draw entry text
-    this.context.fillText("> "+command /*+ (this.cursorVis?this.cursorSymbol:"")*/, offset*2, canvas.height - offset*2); 
+    if(!waiting){
+        //Draw entry text
+        this.context.fillText("> "+command /*+ (this.cursorVis?this.cursorSymbol:"")*/, offset*2, canvas.height - offset*2); 
 
-    //Draw cursor
-    if(this.cursorVis)
-        this.context.fillRect(offset*2+(cursorIndex+2)*fontWid,canvas.height - offset*2-fontSize*.8,fontWid/2,fontSize);
+        //Draw cursor
+        if(this.tick%2==0)
+            this.context.fillRect(offset*2+(cursorIndex+2)*fontWid,canvas.height - offset*2-fontSize*.8,fontWid/2,fontSize);
+    }
+    else{
+        var dots = "";
+
+        if(this.tick%4==1) dots = ".";
+        else if(this.tick%4==2) dots = ". .";
+        else if(this.tick%4==3) dots = ". . .";
+
+        //Draw waiting text
+        this.context.fillText("  "+dots, offset*2, canvas.height - offset*2); 
+    }
+
 
     //Draw terminal text
     var count = 1, max_len = 156, max_line = 74;

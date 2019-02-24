@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
 		game.addNewPlayer(socket);
   	});
 
-  	socket.on('player-action', (data) => {
+  	socket.on('command', (data) => {
     	game.updatePlayerOnInput(socket.id, data);
   	});
 
